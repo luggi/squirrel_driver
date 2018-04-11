@@ -23,6 +23,12 @@ namespace motor_control
         UINT8_T id;
         dynamixel_tool::DynamixelTool *tool;
     };
+    
+    struct Feedback_t {
+    std::vector<double> positions;
+    std::vector<double> velocities;
+    std::vector<double> torques;
+    };
 
 
     class MotorUtilities
@@ -68,7 +74,7 @@ namespace motor_control
         */
         bool write(std::vector<double>commands);
 
-        std::vector<double> read();
+        Feedback_t read();
 
 
     private:	

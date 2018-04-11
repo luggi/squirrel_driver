@@ -34,7 +34,6 @@
     <arg name="robot" value="$(arg robot)" />
   </include>
 
-
   <group ns="arm_controller">
     <node name="squirrel_control_node" pkg="squirrel_control" type="squirrel_hw_main" output="screen" respawn="true">
       <!--remap from="/cmd_rotatory" to="/cmd_vel"/-->
@@ -51,6 +50,5 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
     <node name="joint_states_relay" pkg="topic_tools" type="relay" args="joint_states /joint_states" cwd="node" respawn="true" output="screen"/>
-
   </group>
 </launch>

@@ -356,62 +356,45 @@ namespace squirrel_control {
 
 	void SquirrelHWInterface::read(ros::Duration &elapsed_time) {
 		odom_lock_.lock();
-        auto positions = motor_interface_->read();
-		switch(current_mode_) {
-			case control_modes::POSITION_MODE:
-				{
-					for(int i=0; i < joint_names_.size(); ++i)
-					{
-						if(joint_names_[i] == "base_jointx") {
-							joint_position_[i] = posBuffer_[0];
-						} else if (joint_names_[i] == "base_jointy") {
-							joint_position_[i] = posBuffer_[1];
-						} else if (joint_names_[i] == "base_jointz") {
-							joint_position_[i] = posBuffer_[2];
-						} else if (joint_names_[i] == "arm_joint1") {
-							joint_position_[i] = positions[0];
-						} else if (joint_names_[i] == "arm_joint2") {
-							joint_position_[i] = positions[1];
-						} else if (joint_names_[i] == "arm_joint3") {
-							joint_position_[i] = positions[2];
-						} else if (joint_names_[i] == "arm_joint4") {
-							joint_position_[i] = positions[3];
-						} else if (joint_names_[i] == "arm_joint5") {
-							joint_position_[i] = positions[4];
-						}
-					}
-				}
-				break;
-			case control_modes::VELOCITY_MODE:
-				{
-					throw_control_error(true, "VELOCITY_MODE not tested!");
+        auto feedback = motor_interface_->read();
+        
+        /*for(int i=0; i<5; i++) {
 
-					joint_velocity_[0] = velBuffer_[0];
-					joint_velocity_[1] = velBuffer_[1];
-					joint_velocity_[2] = velBuffer_[2];
-					auto velocities = motor_interface_->read();
-					for (int i = 0; i < num_joints_-3; i++) {
-						joint_velocity_[i + 3] = velocities[i];
-					}
-				}
-				break;
-			case control_modes::TORQUE_MODE:
-				{
-					throw_control_error(true, "TORQUE_MODE not tested!");
-
-					joint_effort_[0] = velBuffer_[0];
-					joint_effort_[1] = velBuffer_[1];
-					joint_effort_[2] = velBuffer_[2];
-					auto torques = motor_interface_->read();
-					for (int i = 0; i < num_joints_-3; i++) {
-						joint_effort_[i + 3] = torques[i];
-					}
-				}
-				break;
-			default:
-				odom_lock_.unlock();
-				throw_control_error(true, "Unknown mode: " << current_mode_);
+        std::cout << "pos: " << feedback.positions[i] << std::endl;
+        std::cout << "vel: " << feedback.velocities[i] << std::endl;
+        std::cout << "tor: " << feedback.torques[i] << std::endl;
+	}*/
+		for(int i=0; i < joint_names_.size(); ++i)
+		{
+            if(joint_names_[i] == "base_jointx") {
+                joint_position_[i] = posBuffer_[0];
+            } else if (joint_names_[i] == "base_jointy") {
+                joint_position_[i] = posBuffer_[1];
+            } else if (joint_names_[i] == "base_jointz") {
+                joint_position_[i] = posBuffer_[2];
+            } else if (joint_names_[i] == "arm_joint1") {
+                joint_position_[i] = feedback.positions[0];
+                joint_velocity_[i] = feedback.velocities[0];
+                joint_effort_[i]   = feedback.torques[0]; 
+            } else if (joint_names_[i] == "arm_joint2") {
+                joint_position_[i] = feedback.positions[1];
+                joint_velocity_[i] = feedback.velocities[1];
+                joint_effort_[i]   = feedback.torques[1]; 
+            } else if (joint_names_[i] == "arm_joint3") {
+                joint_position_[i] = feedback.positions[2];
+                joint_velocity_[i] = feedback.velocities[2];
+                joint_effort_[i]   = feedback.torques[2];
+            } else if (joint_names_[i] == "arm_joint4") {
+                joint_position_[i] = feedback.positions[3];
+                joint_velocity_[i] = feedback.velocities[3];
+                joint_effort_[i]   = feedback.torques[3];
+            } else if (joint_names_[i] == "arm_joint5") {
+                joint_position_[i] = feedback.positions[4];
+                joint_velocity_[i] = feedback.velocities[4];
+                joint_effort_[i]   = feedback.torques[4];
+            }
 		}
+
 		odom_lock_.unlock();
         if((ignore_base && reset_signal_) || !first_broadcast_)
         {
@@ -423,15 +406,34 @@ namespace squirrel_control {
             current_joint_state.velocity = std::vector<double>(8,0.0);
             current_joint_state.effort = std::vector<double>(8,0.0);
             current_joint_state.name[0] = "arm_joint1";
-            current_joint_state.position[0] = positions[0];
+            current_joint_state.position[0] = feedback.positions[0];
+            current_joint_state.velocity[0] = feedback.velocities[0];
+            current_joint_state.effort[0] = feedback.torques[0];
+
             current_joint_state.name[1] = "arm_joint2";
-            current_joint_state.position[1] = positions[1];
+            current_joint_state.position[1] = feedback.positions[1];
+			current_joint_state.position[1] = feedback.positions[1];
+			current_joint_state.velocity[1] = feedback.velocities[1];
+			current_joint_state.effort[1] = feedback.torques[1];
+
             current_joint_state.name[2] = "arm_joint3";
-            current_joint_state.position[2] = positions[2];
+            current_joint_state.position[2] = feedback.positions[2];
+			current_joint_state.position[2] = feedback.positions[2];
+			current_joint_state.velocity[2] = feedback.velocities[2];
+			current_joint_state.effort[2] = feedback.torques[2];
+
             current_joint_state.name[3] = "arm_joint4";
-            current_joint_state.position[3] = positions[3];
+            current_joint_state.position[3] = feedback.positions[3];
+			current_joint_state.position[3] = feedback.positions[3];
+			current_joint_state.velocity[3] = feedback.velocities[3];
+			current_joint_state.effort[3] = feedback.torques[3];
+
             current_joint_state.name[4] = "arm_joint5";
-            current_joint_state.position[4] = positions[4];
+            current_joint_state.position[4] = feedback.positions[4];
+			current_joint_state.position[4] = feedback.positions[4];
+			current_joint_state.velocity[4] = feedback.velocities[4];
+			current_joint_state.effort[4] = feedback.torques[4];
+
             current_joint_state.name[5] = "base_jointx";
             current_joint_state.position[5] = posBuffer_[0];
             current_joint_state.name[6] = "base_jointy";
@@ -444,9 +446,9 @@ namespace squirrel_control {
             control_msgs::JointTrajectoryControllerState control_state;
             control_state.joint_names = current_joint_state.name;
             control_state.actual.positions = current_joint_state.position;
-            control_state.actual.velocities = std::vector<double>(8,0.0);
+            control_state.actual.velocities = current_joint_state.velocity;
             control_state.actual.accelerations = std::vector<double>(8,0.0);
-            control_state.actual.effort = std::vector<double>(8,0.0);
+            control_state.actual.effort = current_joint_state.effort;
             control_state.desired = control_state.actual;
             control_state.error.positions = std::vector<double>(8,0.0);
             control_state.error.velocities = std::vector<double>(8,0.0);
