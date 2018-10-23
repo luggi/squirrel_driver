@@ -25,7 +25,7 @@ namespace motor_control {
         std::cout << "Switching to mode " << mode << std::endl;
 
         if (mode == control_modes::ControlMode::VELOCITY_MODE || mode == control_modes::ControlMode::TORQUE_MODE) {
-            throw_control_error(true, "Controller currently only supports position control!");
+            //throw_control_error(true, "Controller currently only supports position control!");
         }
 
         disableTorque();
@@ -35,7 +35,7 @@ namespace motor_control {
         try {
             motor_lock_.lock();
             current_mode_ = mode;
-            for(const auto motor : motors_){
+            for(const auto motor : motors_) {
                 comm = packet_handler_->Write1ByteTxRx(port_handler_, motor.id,
                                                        motor.tool->ctrl_table_["operating_mode"]->address,
                                                        (UINT8_T)current_mode_, &error);
@@ -112,7 +112,8 @@ namespace motor_control {
         enableTorque();
         for(auto const& motor: motors_) {
             std::cout << "Starting motor " << static_cast<int>(motor.id)<< std::endl;
-            comm = packet_handler_->Write2ByteTxRx(port_handler_, motor.id, motor.tool->ctrl_table_["external_port_data_1"]->address, 4095, &error);
+            if(motor.id == 0)
+                comm = packet_handler_->Write2ByteTxRx(port_handler_, motor.id, motor.tool->ctrl_table_["external_port_data_1"]->address, 4095, &error);
             if(comm != 0) {
                 std::cout << "Failed to loosen brakes for motor " << static_cast<int>(motor.id) << " (" << motor.tool->model_name_ << ")" << std::endl;
             }
@@ -178,7 +179,7 @@ namespace motor_control {
         motor_lock_.lock();
 
         //we throw a bunch of own exceptions - let's catch them all and forward them to at all times release the lock
-        //Motor 3 has an offset of 228000 ticks - we do not have to treat that one, the dynamiel formware takes care of that
+        //Motor 3 has an offset of 228000 ticks - we do not have to treat that one, the dynamiel firmware takes care of that
         try {
             for (auto const motor : motors_) {
                 switch (current_mode_) {

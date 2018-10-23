@@ -14,11 +14,15 @@ squirrel_hw_interface:
       - arm_joint4
       - arm_joint5 
    motor_port: /dev/ttyArm
-   ignore_base: false
+   ignore_base: true
 
 
 joint_state_controller:
    type:         joint_state_controller/JointStateController
+   publish_rate: 50
+
+joint_effort_controller:
+   type:         joint_effort_controller/JointEffortController
    publish_rate: 50
 
 

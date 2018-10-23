@@ -322,12 +322,12 @@ namespace squirrel_control {
 			const std::list<hardware_interface::ControllerInfo> &stop_list)
 	{
 		std::list<hardware_interface::ControllerInfo>::const_iterator it;
-		for (it = stop_list.begin(); it != stop_list.end(); ++it)
-		{
-			if (it->hardware_interface != JOINT_STATE_INTERFACE) {
-				enabled_ = false;
-			}
-		}
+		//for (it = stop_list.begin(); it != stop_list.end(); ++it)
+		//{
+		//	if (it->hardware_interface != JOINT_STATE_INTERFACE) {
+		//		enabled_ = false;
+		//	}
+		//}
 
 		hardware_interface::RobotHW::doSwitch(start_list, stop_list);
 
@@ -536,7 +536,7 @@ namespace squirrel_control {
 				last_base_cmd_ = base_cmds_;
 				break;
 			case control_modes::VELOCITY_MODE:
-				throw_control_error(true, "VELOCITY_MODE not tested!");
+				//throw_control_error(true, "VELOCITY_MODE not tested!");
 
 				twist.linear.x = joint_velocity_command_[0];
 				twist.linear.y = joint_velocity_command_[1];
@@ -549,7 +549,7 @@ namespace squirrel_control {
 				}
 				break;
 			case control_modes::TORQUE_MODE:
-				throw_control_error(true, "TORQUE_MODE not tested!");
+				//throw_control_error(true, "TORQUE_MODE not tested!");
 
 				twist.linear.x = joint_effort_command_[0];
 				twist.linear.y = joint_effort_command_[1];
